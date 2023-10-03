@@ -33,6 +33,25 @@ class NetworkManager {
         }
     }
     
+    func fetvhMarketData() async -> MarketData? {
+        let endpoint = baseURL + "global"
+        
+        guard let url = URL(string: endpoint) else {
+            print("Bad URL")
+            return nil
+        }
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            let globalData = try JSONDecoder().decode(GlobalData.self, from: data)
+            return globalData.data
+        } catch {
+            print("Parsing error")
+            return nil
+        }
+        
+    }
+    
     func downloadImage(urlString: String) async -> UIImage? {
         
         let cacheKey = NSString(string: urlString)

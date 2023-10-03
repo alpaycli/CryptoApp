@@ -9,7 +9,7 @@ import UIKit
 
 final class PortfolioCoinsListVC: UIViewController {
     
-    private var portfolioCoins: [Coin] = []
+    var portfolioCoins: [Coin] = []
     private let tableView = UITableView()
 
     override func viewDidLoad() {

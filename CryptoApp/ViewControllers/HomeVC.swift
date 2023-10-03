@@ -9,19 +9,30 @@ import UIKit
 
 final class HomeVC: UIViewController {
     
-    var showPortolio = false
+    private var showPortolio = false
     
+    private let statisticsView = UIView()
     private let allCoinsListView = UIView()
     private let portfolioCoinsListView = UIView()
     
+    private var statisticsVC: StatisticsVC
     private let allCoinsListVC = CoinsListVC()
     private let portfolioCoinsListVC = PortfolioCoinsListVC()
-    
+        
     private let navbarStackView = UIStackView()
     private let navLeadingButton = CRCircleButton(iconName: "info")
     private let navbarText = GFTitleLabel(textAlignment: .center, fontSize: 18)
     private let navTrailingButton = CRCircleButton(iconName: "arrow.right")
         
+    init() {
+        statisticsVC = StatisticsVC(portfolioCoins: portfolioCoinsListVC.portfolioCoins)
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -57,10 +68,11 @@ final class HomeVC: UIViewController {
         navbarStackView.addArrangedSubview(navTrailingButton)
     }
     
-    @objc func rightArrowTap(_ sender: UITapGestureRecognizer? = nil) {
-        if showPortolio { showPortolio = false } else { showPortolio = true }
+    @objc private func rightArrowTap(_ sender: UITapGestureRecognizer? = nil) {
+        showPortolio.toggle()
         UIView.animate(withDuration: 0.5) {
             self.navTrailingButton.transform = self.showPortolio ? CGAffineTransform(rotationAngle: .pi) : CGAffineTransform.identity
+            self.statisticsVC.stackView.frame.origin.x = self.showPortolio ? -100 : 15
         }
         toggleView()
     }
@@ -68,14 +80,17 @@ final class HomeVC: UIViewController {
     private func setupViewControllers() {
         self.add(childVC: portfolioCoinsListVC, to: portfolioCoinsListView)
         self.add(childVC: allCoinsListVC, to: allCoinsListView)
+        self.add(childVC: statisticsVC, to: statisticsView)
     }
     
     private func layoutUI() {
         view.addSubview(navbarStackView)
+        view.addSubview(statisticsView)
         view.addSubview(portfolioCoinsListView)
         view.addSubview(allCoinsListView)
         
         navbarStackView.translatesAutoresizingMaskIntoConstraints = false
+        statisticsView.translatesAutoresizingMaskIntoConstraints = false
         portfolioCoinsListView.translatesAutoresizingMaskIntoConstraints = false
         allCoinsListView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -87,12 +102,17 @@ final class HomeVC: UIViewController {
             navbarStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding),
             navbarStackView.heightAnchor.constraint(equalToConstant: 40),
             
-            portfolioCoinsListView.topAnchor.constraint(equalTo: navbarStackView.bottomAnchor, constant: 40),
+            statisticsView.topAnchor.constraint(equalTo: navbarStackView.bottomAnchor, constant: 20),
+            statisticsView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            statisticsView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            statisticsView.heightAnchor.constraint(equalToConstant: 60),
+            
+            portfolioCoinsListView.topAnchor.constraint(equalTo: statisticsView.bottomAnchor, constant: 40),
             portfolioCoinsListView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             portfolioCoinsListView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             portfolioCoinsListView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             
-            allCoinsListView.topAnchor.constraint(equalTo: navbarStackView.bottomAnchor, constant: 40),
+            allCoinsListView.topAnchor.constraint(equalTo: statisticsView.bottomAnchor, constant: 40),
             allCoinsListView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             allCoinsListView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             allCoinsListView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
@@ -106,7 +126,7 @@ final class HomeVC: UIViewController {
         childVC.didMove(toParent: self)
     }
     
-    func toggleView() {
+    private func toggleView() {
         if showPortolio {
             UIView.animate(withDuration: 0.5) {
                 self.allCoinsListView.frame.origin.x = -self.view.frame.width
