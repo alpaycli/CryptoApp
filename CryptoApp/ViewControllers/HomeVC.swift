@@ -11,7 +11,17 @@ final class HomeVC: UIViewController {
     
     private var showPortolio = false
     
+    private let navbarStackView = UIStackView()
+    private let navLeadingButton = CRCircleButton(iconName: "info")
+    private let navbarText = GFTitleLabel(textAlignment: .center, fontSize: 18)
+    private let navTrailingButton = CRCircleButton(iconName: "arrow.right")
+    
     private let statisticsView = UIView()
+    
+    private let columnFirstTitle = GFSecondaryTitleLabel(fontSize: 14)
+    private let columnSecondTitle = GFSecondaryTitleLabel(fontSize: 14)
+    private let columnThirdTitle = GFSecondaryTitleLabel(fontSize: 14)
+    
     private let allCoinsListView = UIView()
     private let portfolioCoinsListView = UIView()
     
@@ -19,13 +29,8 @@ final class HomeVC: UIViewController {
     private let allCoinsListVC = CoinsListVC()
     private let portfolioCoinsListVC = PortfolioCoinsListVC()
         
-    private let navbarStackView = UIStackView()
-    private let navLeadingButton = CRCircleButton(iconName: "info")
-    private let navbarText = GFTitleLabel(textAlignment: .center, fontSize: 18)
-    private let navTrailingButton = CRCircleButton(iconName: "arrow.right")
-        
     init() {
-        statisticsVC = StatisticsVC(portfolioCoins: portfolioCoinsListVC.portfolioCoins)
+        statisticsVC = StatisticsVC(portfolioCoins: [])
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -38,14 +43,14 @@ final class HomeVC: UIViewController {
         view.backgroundColor = .systemBackground
         navigationController?.navigationBar.isHidden = true
         setupViewControllers()
-        configureStackView()
+        configureNavbarStackView()
         layoutUI()
         
         allCoinsListView.frame.origin.x = self.view.frame.width
-        portfolioCoinsListView.frame.origin.x = 0
+        portfolioCoinsListView.frame.origin.x = -self.view.frame.width
     }
     
-    private func configureStackView() {
+    private func configureNavbarStackView() {
         navbarStackView.axis = .horizontal
         navbarStackView.distribution = .equalSpacing
         
@@ -77,15 +82,16 @@ final class HomeVC: UIViewController {
         toggleView()
     }
     
-    private func setupViewControllers() {
-        self.add(childVC: portfolioCoinsListVC, to: portfolioCoinsListView)
-        self.add(childVC: allCoinsListVC, to: allCoinsListView)
-        self.add(childVC: statisticsVC, to: statisticsView)
-    }
-    
     private func layoutUI() {
         view.addSubview(navbarStackView)
         view.addSubview(statisticsView)
+        
+        view.addSubview(columnFirstTitle)
+        view.addSubview(columnSecondTitle)
+        view.addSubview(columnThirdTitle)
+        columnFirstTitle.text = "Coin"
+        columnThirdTitle.text = "Price"
+        
         view.addSubview(portfolioCoinsListView)
         view.addSubview(allCoinsListView)
         
@@ -107,16 +113,40 @@ final class HomeVC: UIViewController {
             statisticsView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             statisticsView.heightAnchor.constraint(equalToConstant: 60),
             
-            portfolioCoinsListView.topAnchor.constraint(equalTo: statisticsView.bottomAnchor, constant: 40),
+            columnFirstTitle.topAnchor.constraint(equalTo: statisticsView.bottomAnchor, constant: 40),
+            columnFirstTitle.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            columnFirstTitle.heightAnchor.constraint(equalToConstant: 30),
+            
+            columnThirdTitle.topAnchor.constraint(equalTo: columnFirstTitle.topAnchor),
+            columnThirdTitle.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            columnThirdTitle.heightAnchor.constraint(equalToConstant: 40),
+            
+            portfolioCoinsListView.topAnchor.constraint(equalTo: columnFirstTitle.bottomAnchor, constant: 10),
             portfolioCoinsListView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             portfolioCoinsListView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             portfolioCoinsListView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             
-            allCoinsListView.topAnchor.constraint(equalTo: statisticsView.bottomAnchor, constant: 40),
+            allCoinsListView.topAnchor.constraint(equalTo: columnFirstTitle.bottomAnchor, constant: 10),
             allCoinsListView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             allCoinsListView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             allCoinsListView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
+    }
+    
+    private func toggleView() {
+        if showPortolio {
+            UIView.animate(withDuration: 0.5) {
+                print("sa")
+                self.allCoinsListView.frame.origin.x = -self.view.frame.width
+                self.portfolioCoinsListView.frame.origin.x = 0
+            }
+        } else {
+            UIView.animate(withDuration: 0.5) {
+                print("as")
+                self.portfolioCoinsListView.frame.origin.x = self.view.frame.width
+                self.allCoinsListView.frame.origin.x = 0
+            }
+        }
     }
     
     private func add(childVC: UIViewController, to containerView: UIView) {
@@ -126,18 +156,9 @@ final class HomeVC: UIViewController {
         childVC.didMove(toParent: self)
     }
     
-    private func toggleView() {
-        if showPortolio {
-            UIView.animate(withDuration: 0.5) {
-                self.allCoinsListView.frame.origin.x = -self.view.frame.width
-                self.portfolioCoinsListView.frame.origin.x = 0
-            }
-        } else {
-            UIView.animate(withDuration: 0.5) {
-                self.portfolioCoinsListView.frame.origin.x = self.view.frame.width
-                self.allCoinsListView.frame.origin.x = 0
-            }
-        }
+    private func setupViewControllers() {
+        self.add(childVC: portfolioCoinsListVC, to: portfolioCoinsListView)
+        self.add(childVC: allCoinsListVC, to: allCoinsListView)
+        self.add(childVC: statisticsVC, to: statisticsView)
     }
-    
 }

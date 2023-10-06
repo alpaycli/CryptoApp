@@ -16,8 +16,7 @@ final class CoinsListVC: UIViewController {
         super.viewDidLoad()
         configure()
         layoutUI()
-        coins = [ Coin.example, Coin.example ]
-        //Task { await getCoins() }
+        Task { await getCoins() }
     }
     
     override func viewWillAppear(_ animated: Bool) {

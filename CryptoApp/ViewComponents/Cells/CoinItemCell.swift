@@ -10,12 +10,12 @@ import UIKit
 class CoinItemCell: UITableViewCell {
 
     static let reuseId = "CoinItemCell"
-    let rank = GFSecondaryTitleLabel(fontSize: 14)
-    let avatarImage = GFAvatarImageView(frame: .zero)
-    let titleLabel = GFTitleLabel(textAlignment: .left, fontSize: 20)
+    private let rank = GFSecondaryTitleLabel(fontSize: 14)
+    private let avatarImage = GFAvatarImageView(frame: .zero)
+    private let titleLabel = GFTitleLabel(textAlignment: .left, fontSize: 20)
     
-    let currentPriceLabel = GFTitleLabel(textAlignment: .right, fontSize: 16)
-    let priceChangeLabel = GFSecondaryTitleLabel(fontSize: 16)
+    private let currentPriceLabel = GFTitleLabel(textAlignment: .right, fontSize: 16)
+    private let priceChangeLabel = GFSecondaryTitleLabel(fontSize: 16)
     
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -34,8 +34,7 @@ class CoinItemCell: UITableViewCell {
         
         currentPriceLabel.text = coin.currentPrice.asCurrencyWith6Decimals()
         priceChangeLabel.text = coin.priceChangePercentage24H?.asPercentString()
-        priceChangeLabel.textColor = coin.priceChangePercentage24H ?? 0 > 0 ?
-        UIColor.theme.greenColor : UIColor.theme.redColor
+        priceChangeLabel.textColor = coin.priceChangePercentage24H ?? 0 > 0 ? UIColor.theme.greenColor : UIColor.theme.redColor
     }
     
     private func configure() {

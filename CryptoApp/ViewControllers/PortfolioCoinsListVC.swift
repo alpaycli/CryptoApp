@@ -9,7 +9,11 @@ import UIKit
 
 final class PortfolioCoinsListVC: UIViewController {
     
-    var portfolioCoins: [Coin] = []
+    private var portfolioCoins: [Coin] = [] // PortfolioCoins
+    
+    private var allCoins: [Coin] = [] // AllCoins
+    private var dataService = PortfolioDataService() // PortfolioEntities
+    
     private let tableView = UITableView()
 
     override func viewDidLoad() {
@@ -24,9 +28,22 @@ final class PortfolioCoinsListVC: UIViewController {
     }
     
     private func getCoins() {
-        portfolioCoins = [
-            Coin.example
-        ]
+        Task {
+            allCoins = await NetworkManager.shared.getCoins()
+            portfolioCoins = mapAllCoinsToPortolioCoins(allCoins: allCoins, portfolioEntities: dataService.portfolioCoins)
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+                self.view.bringSubviewToFront(self.tableView)
+            }
+        }
+    }
+    
+    private func mapAllCoinsToPortolioCoins(allCoins: [Coin], portfolioEntities: [PortfolioEntity]) -> [Coin] {
+        allCoins
+            .compactMap { coin -> Coin? in
+                guard let entity = portfolioEntities.first(where: { $0.id == coin.id }) else { return nil }
+                return coin.updateHoldings(with: entity.amount)
+        }
     }
     
     private func configure() {
